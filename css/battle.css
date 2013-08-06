@@ -1,0 +1,11 @@
+@CHARSET "US-ASCII";
+
+#mycanvas {
+	/*display: inline;*/
+	float:left;
+}
+
+#info {
+	float:left;
+	/*display: inline;*/
+}
