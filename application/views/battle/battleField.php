@@ -5,6 +5,7 @@
 	<head>
 	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
+	<link rel="stylesheet" type="text/css" href="<?= base_url() ?>/css/battle.css" />
 	<script>
 
 		var otherUser = "<?= $otherUser->login ?>";
@@ -54,6 +55,8 @@
 <body>  
 	<h1>Battle Field</h1>
 
+	<div id="container">
+	<div id="info">
 	<div>
 	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
 	</div>
@@ -77,11 +80,144 @@
 	echo form_close();
 	
 ?>
+
 	
-	
-	
+
+	<canvas id="battleCanvas" width="700px" height="400px"  ></canvas>
+
+
 	
 </body>
+<script>
+	var tank1 = new Image();
+	var tank2 = new Image();
 
+	var currentX = 15;
+	var currentY = 15;
+
+	var currentAngle = 0;
+	
+	var gunAngle = 0;
+	
+	var mouseX = 0;
+	var mouseY = 0;
+
+	tank1.src = 'tank1.jpg';
+	tank2.src = 'tank2.jpg';
+
+	var canvas = document.getElementById("battleCanvas");
+	var context = canvas.getContext("2d");
+	context.drawImage(tank1, currentX - 15, currentY - 15, 30, 30);
+	context.drawImage(tank1, currentX, currentY, 30, 5);
+
+	$(document).keydown(function(e) {
+		if (e.keyCode == 87) {
+			move('forward');
+		} else if (e.keyCode == 65) {
+			turn('left');
+		} else if (e.keyCode == 68) {
+			turn('right');
+		} else if (e.keyCode == 83) {
+			move('backward');
+		}
+	});
+
+	
+	$(document).mousemove(function(e) {
+		mouseX = e.pageX - canvas.offsetLeft;
+		mouseY = e.pageY - canvas.offsetTop;
+		var ratio = (mouseY - currentY) / (mouseX - currentX);
+		if ((mouseX - currentX) < 0) {
+			gunAngle = (Math.PI + Math.atan(ratio)) * (180 / Math.PI);
+		} else {
+			gunAngle =  Math.atan(ratio) * (180 / Math.PI);
+		}
+		
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.save();
+		context.translate(currentX, currentY);
+		context.rotate(currentAngle * Math.PI / 180);
+		context.drawImage(tank1, -15, -15, 30, 30);
+		context.restore();
+		
+		context.save();
+		context.translate(currentX, currentY);
+		context.rotate(gunAngle * Math.PI / 180);
+		context.drawImage(tank1, 0, 0, 30, 5);
+		context.restore();
+
+	});
+
+	function move(direction) {
+		if (direction === 'forward') {
+			currentX += Math.cos(currentAngle * Math.PI / 180);
+			currentY += Math.sin(currentAngle * Math.PI / 180);
+
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(currentAngle * Math.PI / 180);
+			context.drawImage(tank1, -15, -15, 30, 30);
+			context.restore();
+			
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(gunAngle * Math.PI / 180);
+			context.drawImage(tank1, 0, 0, 30, 5);
+			context.restore();
+			
+			
+		} else if (direction === 'backward') {
+			currentX -= Math.cos(currentAngle * Math.PI / 180);
+			currentY -= Math.sin(currentAngle * Math.PI / 180);
+
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(currentAngle * Math.PI / 180);
+			context.drawImage(tank1, -15, -15, 30, 30);
+			context.restore();
+			
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(gunAngle * Math.PI / 180);
+			context.drawImage(tank1, 0, 0, 30, 5);
+			context.restore();
+		}
+	}
+
+	function turn(direction) {
+		if (direction === 'left') {
+			currentAngle -= 1;
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(currentAngle * Math.PI / 180);
+			context.drawImage(tank1, -15, -15, 30, 30);
+			context.restore();
+			
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(gunAngle * Math.PI / 180);
+			context.drawImage(tank1, 0, 0, 30, 5);
+			context.restore();
+			
+		} else if (direction === 'right') {
+			currentAngle += 1;
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(currentAngle * Math.PI / 180);
+			context.drawImage(tank1, -15, -15, 30, 30);
+			context.restore();
+			
+			context.save();
+			context.translate(currentX, currentY);
+			context.rotate(gunAngle * Math.PI / 180);
+			context.drawImage(tank1, 0, 0, 30, 5);
+			context.restore();
+		}
+	}
+</script>
 </html>
 

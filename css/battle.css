@@ -1,11 +1,10 @@
-@CHARSET "US-ASCII";
-
-#mycanvas {
-	/*display: inline;*/
-	float:left;
-}
 
 #info {
 	float:left;
 	/*display: inline;*/
+}
+
+#battleCanvas {
+	border: solid black 3px;
+	float:left;
 }

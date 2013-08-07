@@ -46,8 +46,16 @@
 	echo form_input('last',set_value('last'),"required");
 	echo form_label('Email');
 	echo form_error('email');
-	echo form_input('email',set_value('email'),"required");
-	echo form_submit('submit', 'Register');
+	echo form_input('email',set_value('email'),"required");?>
+	<br>
+	<p>Please enter the image exactly as you see it.</p>
+	<img src="/securimage/securimage_show.php" id="captcha" alt="CAPTCHA IMG" />
+			<input type="text" name="captcha_code" size="10" maxlength="6" />
+			<a href="#"
+			onclick="document.getElementById('captcha').src = '/securimage/securimage_show.php?' + Math.random(); return false">[ Different Image ]</a>
+	<br/>
+	<br/>
+	<?php echo form_submit('submit', 'Register');
 	echo form_close();
 ?>	
 </body>
