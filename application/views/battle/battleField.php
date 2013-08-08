@@ -51,12 +51,14 @@
 		});
 	
 	</script>
+	
+	
 	</head> 
 <body>  
-	<h1>Battle Field</h1>
+	<!-- <h1>Battle Field</h1> -->
 
-	<div id="container">
-	<div id="info">
+<div id="container">
+	<!--<div id="info">
 	<div>
 	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
 	</div>
@@ -68,18 +70,18 @@
 		else
 			echo "Wating on " . $otherUser->login;
 	?>
-	</div>
+	</div> -->
 	
 <?php 
 	
-	echo form_textarea('conversation');
+	/*echo form_textarea('conversation');
 	
 	echo form_open();
 	echo form_input('msg');
 	echo form_submit('Send','Send');
-	echo form_close();
+	echo form_close();*/
 	
-?>
+?> 
 
 	
 
@@ -88,6 +90,7 @@
 
 	
 </body>
+
 <script>
 	var tank1 = new Image();
 	var tank2 = new Image();
@@ -102,8 +105,8 @@
 	var mouseX = 0;
 	var mouseY = 0;
 
-	tank1.src = 'tank1.jpg';
-	tank2.src = 'tank2.jpg';
+	tank1.src = 'http://localhost:30910/tanks/images/tank1.jpg';
+	tank2.src = 'http://localhost:30910/tanks/images/tank2.jpg';
 
 	var canvas = document.getElementById("battleCanvas");
 	var context = canvas.getContext("2d");
@@ -219,5 +222,6 @@
 		}
 	}
 </script>
+
 </html>
 
