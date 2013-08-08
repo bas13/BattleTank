@@ -105,8 +105,8 @@
 	var mouseX = 0;
 	var mouseY = 0;
 
-	tank1.src = 'http://localhost:30910/tanks/images/tank1.jpg';
-	tank2.src = 'http://localhost:30910/tanks/images/tank2.jpg';
+	tank1.src = "<?= base_url() ?>images/tank1.jpg";
+	tank2.src = "<?= base_url() ?>images/tank2.jpg";
 
 	var canvas = document.getElementById("battleCanvas");
 	var context = canvas.getContext("2d");
