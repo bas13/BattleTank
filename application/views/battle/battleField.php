@@ -2,11 +2,12 @@
 <!DOCTYPE html>
 
 <html>
-	<head>
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
-	<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
-	<link rel="stylesheet" type="text/css" href="<?= base_url() ?>/css/battle.css" />
-	<script>
+<head>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="<?= base_url() ?>/js/jquery.timers.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="<?= base_url() ?>/css/battle.css" />
+<script>
 
 		var otherUser = "<?= $otherUser->login ?>";
 		var user = "<?= $user->login ?>";
@@ -51,14 +52,14 @@
 		});
 	
 	</script>
-	
-	
-	</head> 
-<body>  
+
+
+</head>
+<body>
 	<!-- <h1>Battle Field</h1> -->
 
-<div id="container">
-	<!--<div id="info">
+	<div id="container">
+		<!--<div id="info">
 	<div>
 	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
 	</div>
@@ -71,47 +72,60 @@
 			echo "Wating on " . $otherUser->login;
 	?>
 	</div> -->
-	
-<?php 
-	
-	/*echo form_textarea('conversation');
-	
-	echo form_open();
-	echo form_input('msg');
-	echo form_submit('Send','Send');
-	echo form_close();*/
-	
-?> 
 
-	
+		<?php 
 
-	<canvas id="battleCanvas" width="700px" height="400px"  ></canvas>
+		/*echo form_textarea('conversation');
+
+		echo form_open();
+		echo form_input('msg');
+		echo form_submit('Send','Send');
+		echo form_close();*/
+
+		?>
 
 
-	
+
+		<canvas id="battleCanvas" width="700px" height="400px"></canvas>
+
 </body>
 
 <script>
 	var tank1 = new Image();
 	var tank2 = new Image();
 
+	tank1.src = "<?= base_url() ?>images/tank1.jpg";
+	tank2.src = "<?= base_url() ?>images/tank2.jpg";
+
+	var canvas = document.getElementById("battleCanvas");
+	var context = canvas.getContext("2d");
+
+	var mouseX = 0;
+	var mouseY = 0;
+
+	// Tank 1 info
 	var currentX = 15;
 	var currentY = 15;
 
 	var currentAngle = 0;
 	
 	var gunAngle = 0;
+
+	// Tank 2 info
+	var currentX2 = canvas.width - 15; 
+	var currentY2 = canvas.height - 15;
+
+	var currentAngle2 = 180;
 	
-	var mouseX = 0;
-	var mouseY = 0;
+	var gunAngle2 = 180;
 
-	tank1.src = "<?= base_url() ?>images/tank1.jpg";
-	tank2.src = "<?= base_url() ?>images/tank2.jpg";
-
-	var canvas = document.getElementById("battleCanvas");
-	var context = canvas.getContext("2d");
+	// Tank 1
 	context.drawImage(tank1, currentX - 15, currentY - 15, 30, 30);
 	context.drawImage(tank1, currentX, currentY, 30, 5);
+
+	// Tank 2
+	context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
+	context.drawImage(tank2, currentX2, currentY2, 30, 5);
 
 	$(document).keydown(function(e) {
 		if (e.keyCode == 87) {
@@ -149,6 +163,11 @@
 		context.drawImage(tank1, 0, 0, 30, 5);
 		context.restore();
 
+
+		// Tank 2
+		context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
+		context.drawImage(tank2, currentX2, currentY2, 30, 5);
+
 	});
 
 	function move(direction) {
@@ -168,6 +187,10 @@
 			context.rotate(gunAngle * Math.PI / 180);
 			context.drawImage(tank1, 0, 0, 30, 5);
 			context.restore();
+
+			// Tank 2
+			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
+			context.drawImage(tank2, currentX2, currentY2, 30, 5);
 			
 			
 		} else if (direction === 'backward') {
@@ -186,6 +209,10 @@
 			context.rotate(gunAngle * Math.PI / 180);
 			context.drawImage(tank1, 0, 0, 30, 5);
 			context.restore();
+
+			// Tank 2
+			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
+			context.drawImage(tank2, currentX2, currentY2, 30, 5);
 		}
 	}
 
@@ -204,6 +231,10 @@
 			context.rotate(gunAngle * Math.PI / 180);
 			context.drawImage(tank1, 0, 0, 30, 5);
 			context.restore();
+
+			// Tank 2
+			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
+			context.drawImage(tank2, currentX2, currentY2, 30, 5);
 			
 		} else if (direction === 'right') {
 			currentAngle += 1;
@@ -219,8 +250,22 @@
 			context.rotate(gunAngle * Math.PI / 180);
 			context.drawImage(tank1, 0, 0, 30, 5);
 			context.restore();
+
+			// Tank 2
+			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
+			context.drawImage(tank2, currentX2, currentY2, 30, 5);
 		}
 	}
+
+	$(function(){
+		$('body').everyTime(2000,function(){
+					$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
+
+							
+					});
+		});
+	});
+	
 </script>
 
 </html>

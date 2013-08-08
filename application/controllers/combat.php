@@ -139,5 +139,84 @@ class Combat extends CI_Controller {
 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
  	
+ 	function getBattleState() {
+ 		$this->load->model('user_model');
+ 		$this->load->model('battle_model');
+ 			
+ 		$user = $_SESSION['user'];
+ 		 
+ 		$user = $this->user_model->get($user->login);
+ 		if ($user->user_status_id != User::BATTLING) {	
+ 			$errormsg="Not in BATTLING state";
+ 			goto error;
+ 		}
+ 		// start transactional mode
+ 		$this->db->trans_begin();
+ 		
+ 		$battle = $this->battle_model->get($user->battle_id);
+ 		
+ 		if ($battle->user2_id === $user->id) {
+ 			$x1 = $battle->u1_x1;
+ 			$y1 = $battle->u1_y1;
+ 			$x2 = $battle->u1_x2;
+ 			$y2 = $battle->u1_y2;
+ 			$angle = $battle->u1_angle;
+ 			$shot = $battle->u1_shot;
+ 			$hit = $battle->u1_hit;
+ 		}
+ 		else if ($battle->user1_id === $user->id) {
+ 			$x1 = $battle->u2_x1;
+ 			$y1 = $battle->u2_y1;
+ 			$x2 = $battle->u2_x2;
+ 			$y2 = $battle->u2_y2;
+ 			$angle = $battle->u2_angle;
+ 			$shot = $battle->u2_shot;
+ 			$hit = $battle->u2_hit;
+ 		}
+
+ 		if ($this->db->trans_status() === FALSE) {
+ 			$errormsg = "Transaction error";
+ 			goto transactionerror;
+ 		}
+ 			
+ 		// if all went well commit changes
+ 		$this->db->trans_commit();
+ 		
+ 		echo json_encode(array('status'=>'success', 'x1'=>$x1, 'x2'=>$x2, 'y1'=>$y1, 'y2'=>$y2, 'angle'=>$angle, 'shot'=>$shot, 'hit'=>$hit));
+ 		return;
+ 		
+ 		transactionerror:
+ 		$this->db->trans_rollback();
+ 		
+ 		error:
+ 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
+ 		
+ 	
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		// if the current user has been invited to battle
+ 		if ($user->user_status_id == User::INVITED) {
+ 			$this->load->model('invite_model');
+ 			$invite = $this->invite_model->get($user->invite_id);
+ 			$hostUser = $this->user_model->getFromId($invite->user1_id);
+ 	
+ 			$msg = array('invited'=>true,'login'=>$hostUser->login);
+ 			echo json_encode($msg);
+ 		}
+ 		else {
+ 			$msg = array('invited'=>false);
+ 			echo json_encode($msg);
+ 		}
+ 	}
+ 	
  }
 
