@@ -20,7 +20,7 @@ class Combat extends CI_Controller {
     
     function index() {
 		$user = $_SESSION['user'];
-    		    	
+    		$data['battleid'] = 0;    	
 	    	$this->load->model('user_model');
 	    	$this->load->model('invite_model');
 	    	$this->load->model('battle_model');
@@ -35,10 +35,15 @@ class Combat extends CI_Controller {
 	    	}
 	    	else if ($user->user_status_id == User::BATTLING) {
 	    		$battle = $this->battle_model->get($user->battle_id);
-	    		if ($battle->user1_id == $user->id)
+	    		if ($battle->user1_id == $user->id) {
 	    			$otherUser = $this->user_model->getFromId($battle->user2_id);
-	    		else
+	    		    $data['battleid']=1;
+	    		}
+	    		else {
 	    			$otherUser = $this->user_model->getFromId($battle->user1_id);
+	    			$data['battleid']=2;
+	    		}
+	    		
 	    	}
 	    	
 	    	$data['user']=$user;
@@ -191,31 +196,54 @@ class Combat extends CI_Controller {
  		error:
  		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  		
+ 	}
  	
+ 	function updateBattleState() {
+ 		$data = $this->input->get_post('json');
+ 		$battleData = json_decode($data);
  		
+ 		$this->load->model('user_model');
+ 		$this->load->model('battle_model');
  		
+ 		$user = $_SESSION['user'];
  		
- 		
- 		
- 		
- 		
- 		
- 		
- 		
- 		
- 		// if the current user has been invited to battle
- 		if ($user->user_status_id == User::INVITED) {
- 			$this->load->model('invite_model');
- 			$invite = $this->invite_model->get($user->invite_id);
- 			$hostUser = $this->user_model->getFromId($invite->user1_id);
- 	
- 			$msg = array('invited'=>true,'login'=>$hostUser->login);
- 			echo json_encode($msg);
+ 		$user = $this->user_model->get($user->login);
+ 		if ($user->user_status_id != User::BATTLING) {
+ 			$errormsg="Not in BATTLING state";
+ 			goto error;
  		}
- 		else {
- 			$msg = array('invited'=>false);
- 			echo json_encode($msg);
+ 		// start transactional mode
+ 		$this->db->trans_begin();
+ 		
+ 		$battle = $this->battle_model->getExclusive($user->battle_id);
+ 		
+ 		if ($battle->user1_id === $user->id) {
+ 			$this->battle_model->updateU1($user->battle_id, $battleData->x1, $battleData->y1, $battleData->x2, 
+ 					$battleData->y2, $battleData->angle, $battleData->shot, $battleData->hit);
  		}
+ 		else if ($battle->user2_id === $user->id) {
+ 			$this->battle_model->updateU2($user->battle_id, $battleData->x1, $battleData->y1, $battleData->x2, 
+ 					$battleData->y2, $battleData->angle, $battleData->shot, $battleData->hit);
+ 		}
+ 		
+ 		if ($this->db->trans_status() === FALSE) {
+ 			$errormsg = "Transaction error";
+ 			goto transactionerror;
+ 		}
+ 		
+ 		// if all went well commit changes
+ 		$this->db->trans_commit();
+ 			
+ 		echo json_encode(array('status'=>'success'));
+ 		return;
+ 			
+ 		transactionerror:
+ 		$this->db->trans_rollback();
+
+ 			
+ 		error:
+ 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
+
  	}
  	
  }
