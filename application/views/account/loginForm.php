@@ -32,11 +32,15 @@
 
 	echo "<p>" . anchor('account/recoverPasswordForm','Recover Password') . "</p>";
 	
-	if (isset($_SESSION['delay'])) {
-	 sleep($_SESSION['delay']);
+	echo form_close();
+	
+	echo "OUTSIDE";
+	if (isset($_SESSION['delay']) && isset($_SESSION['fail_count']) && $_SESSION['fail_count'] > 1) {
+		echo "INSIDE";
+		sleep($_SESSION['delay']);
 	}
 	
-	echo form_close();
+	
 ?>	
 </body>
 

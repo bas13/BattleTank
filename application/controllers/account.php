@@ -45,25 +45,23 @@ class Account extends CI_Controller {
     			if (isset($user) && $user->comparePassword($clearPassword)) {
     				$_SESSION['user'] = $user;
     				$data['user']=$user;
-    				
     				$this->user_model->updateStatus($user->id, User::AVAILABLE);
-    				
     				redirect('arcade/index', 'refresh'); //redirect to the main application page
-    			} else {
-				//Artificial delay code.
-				if(isset($_SESSION['delay']) && isset($_SESSION['fail_count'])) {
+    			} else if(isset($_SESSION['delay']) && isset($_SESSION['fail_count']) && $_SESSION['fail_count'] > 0) {
 					$_SESSION['fail_count'] += 1;
-					$_SESSION['delay'] = pow(2,$_SESSION['fail_count']);
+					$_SESSION['delay'] = pow(2,$_SESSION['fail_count'] - 1);
+					$data['errorMsg'] = 'Incorrect username or password! If incorrect again after pressing Login, wait ' . $_SESSION['delay']*2 .
+					' seconds and then try again!';
 				} else {
 					$_SESSION['fail_count'] = 1;
-					$_SESSION['delay'] = 1;
+					$_SESSION['delay'] = 0;
+					$data['errorMsg']='Incorrect username or password!';
 				}
 				$data['user'] = $user;
-				$data['errorMsg']='Incorrect username or password! Wait ' . $_SESSION['delay']*2 .
-				 ' seconds and then try again!';
 				$this->load->view('account/loginForm',$data);
+				//redirect('account/loginForm', 'refresh');
 			}
-    		}
+    		
     }
 
     function logout() {
