@@ -12,6 +12,7 @@
 		var otherUser = "<?= $otherUser->login ?>";
 		var user = "<?= $user->login ?>";
 		var status = "<?= $status ?>";
+		var battleid = "<?= $battleid ?>";
 		
 		$(function(){
 			$('body').everyTime(2000,function(){
@@ -88,6 +89,10 @@
 
 		<canvas id="battleCanvas" width="700px" height="400px"></canvas>
 
+		<div style="border: solid 3 px;">
+			<p id='test'></p>
+		</div>
+
 </body>
 
 <script>
@@ -119,38 +124,117 @@
 	
 	var gunAngle2 = 180;
 
-	// Tank 1
-	context.drawImage(tank1, currentX - 15, currentY - 15, 30, 30);
-	context.drawImage(tank1, currentX, currentY, 30, 5);
+	$(function(){
+		initializeTanks();
 
-	// Tank 2
-	context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
-	context.drawImage(tank2, currentX2, currentY2, 30, 5);
+		$(document).keydown(function(e) {
+			if (e.keyCode == 87) {
+				move('forward');
+			} else if (e.keyCode == 65) {
+				turn('left');
+			} else if (e.keyCode == 68) {
+				turn('right');
+			} else if (e.keyCode == 83) {
+				move('backward');
+			}
+		});
 
-	$(document).keydown(function(e) {
-		if (e.keyCode == 87) {
-			move('forward');
-		} else if (e.keyCode == 65) {
-			turn('left');
-		} else if (e.keyCode == 68) {
-			turn('right');
-		} else if (e.keyCode == 83) {
-			move('backward');
-		}
+		$(document).mousemove(function(e) {
+			mouseX = e.pageX - canvas.offsetLeft;
+			mouseY = e.pageY - canvas.offsetTop;
+
+			if (battleid == 1) {
+				var ratio = (mouseY - currentY) / (mouseX - currentX);
+				if ((mouseX - currentX) < 0) {
+					gunAngle = (Math.PI + Math.atan(ratio)) * (180 / Math.PI);
+				} else {
+					gunAngle =  Math.atan(ratio) * (180 / Math.PI);
+				}
+			}
+			else {
+				var ratio = (mouseY - currentY2) / (mouseX - currentX2);
+				if ((mouseX - currentX2) < 0) {
+					gunAngle2 = (Math.PI + Math.atan(ratio)) * (180 / Math.PI);
+				} else {
+					gunAngle2 =  Math.atan(ratio) * (180 / Math.PI);
+				}
+				
+			}
+			animateTanks();
+		});
 	});
 
-	
-	$(document).mousemove(function(e) {
-		mouseX = e.pageX - canvas.offsetLeft;
-		mouseY = e.pageY - canvas.offsetTop;
-		var ratio = (mouseY - currentY) / (mouseX - currentX);
-		if ((mouseX - currentX) < 0) {
-			gunAngle = (Math.PI + Math.atan(ratio)) * (180 / Math.PI);
-		} else {
-			gunAngle =  Math.atan(ratio) * (180 / Math.PI);
-		}
-		
+	function initializeTanks() {
 		context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		// Tank 1
+		context.drawImage(tank1, currentX - 15, currentY - 15, 30, 30);
+		context.drawImage(tank1, currentX, currentY, 30, 5);
+
+		// Tank 2
+		context.save();
+		context.translate(currentX2, currentY2);
+		context.rotate(currentAngle2 * Math.PI / 180);
+		context.drawImage(tank2, -15, -15, 30, 30);
+		context.restore();
+
+		context.save();
+		context.translate(currentX2, currentY2);
+		context.rotate(gunAngle2 * Math.PI / 180);
+		context.drawImage(tank2, 0, 0, 30, 5);
+		context.restore();
+	}
+
+	function move(direction) {
+		if (direction === 'forward') {
+			if (battleid == 1) {
+				currentX += Math.cos(currentAngle * Math.PI / 180);
+				currentY += Math.sin(currentAngle * Math.PI / 180);
+			}
+			else {
+				currentX2 += Math.cos(currentAngle2 * Math.PI / 180);
+				currentY2 += Math.sin(currentAngle2 * Math.PI / 180);
+			}
+		} 
+		else if (direction === 'backward') {
+			if (battleid == 1) {
+				currentX -= Math.cos(currentAngle * Math.PI / 180);
+				currentY -= Math.sin(currentAngle * Math.PI / 180);
+			}
+			else {
+				currentX2 -= Math.cos(currentAngle2 * Math.PI / 180);
+				currentY2 -= Math.sin(currentAngle2 * Math.PI / 180);
+			}
+		}
+		animateTanks();
+	}
+
+	function turn(direction) {
+		if (direction === 'left') {
+			if (battleid == 1) {
+				currentAngle -= 1;
+			}
+			else {
+				currentAngle2 -= 1;
+			}
+			
+		}
+		else if (direction === 'right') {
+			if (battleid == 1) {
+				currentAngle += 1;
+			}
+			else {
+				currentAngle2 += 1;
+			}
+		}
+		animateTanks();
+	}
+
+
+	function animateTanks() {
+		context.clearRect(0, 0, canvas.width, canvas.height);
+
+		// Tank 1
 		context.save();
 		context.translate(currentX, currentY);
 		context.rotate(currentAngle * Math.PI / 180);
@@ -163,108 +247,54 @@
 		context.drawImage(tank1, 0, 0, 30, 5);
 		context.restore();
 
-
+		
 		// Tank 2
-		context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
-		context.drawImage(tank2, currentX2, currentY2, 30, 5);
-
-	});
-
-	function move(direction) {
-		if (direction === 'forward') {
-			currentX += Math.cos(currentAngle * Math.PI / 180);
-			currentY += Math.sin(currentAngle * Math.PI / 180);
-
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(currentAngle * Math.PI / 180);
-			context.drawImage(tank1, -15, -15, 30, 30);
-			context.restore();
-			
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(gunAngle * Math.PI / 180);
-			context.drawImage(tank1, 0, 0, 30, 5);
-			context.restore();
-
-			// Tank 2
-			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
-			context.drawImage(tank2, currentX2, currentY2, 30, 5);
-			
-			
-		} else if (direction === 'backward') {
-			currentX -= Math.cos(currentAngle * Math.PI / 180);
-			currentY -= Math.sin(currentAngle * Math.PI / 180);
-
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(currentAngle * Math.PI / 180);
-			context.drawImage(tank1, -15, -15, 30, 30);
-			context.restore();
-			
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(gunAngle * Math.PI / 180);
-			context.drawImage(tank1, 0, 0, 30, 5);
-			context.restore();
-
-			// Tank 2
-			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
-			context.drawImage(tank2, currentX2, currentY2, 30, 5);
-		}
+		context.save();
+		context.translate(currentX2, currentY2);
+		context.rotate(currentAngle2 * Math.PI / 180);
+		context.drawImage(tank2, -15, -15, 30, 30);
+		context.restore();
+		
+		context.save();
+		context.translate(currentX2, currentY2);
+		context.rotate(gunAngle2 * Math.PI / 180);
+		context.drawImage(tank2, 0, 0, 30, 5);
+		context.restore();
 	}
 
-	function turn(direction) {
-		if (direction === 'left') {
-			currentAngle -= 1;
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(currentAngle * Math.PI / 180);
-			context.drawImage(tank1, -15, -15, 30, 30);
-			context.restore();
-			
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(gunAngle * Math.PI / 180);
-			context.drawImage(tank1, 0, 0, 30, 5);
-			context.restore();
+	//function sendTankState() {
+	//	var url = '<?= base_url() ?>combat/updateBattleState';
+	//	var jobj = {};
+	//	jobj['x1'] = currentX;
+	//	jobj['y1'] = currentY;
+	//	jobj['x2'] = currentAngle;
+	//	jobj['y2'] = 0;
+	//	jobj['angle'] = gunAngle;
+	//	jobj['shot'] = 0;
+	//	jobj['hit'] = 0;
 
-			// Tank 2
-			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
-			context.drawImage(tank2, currentX2, currentY2, 30, 5);
-			
-		} else if (direction === 'right') {
-			currentAngle += 1;
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(currentAngle * Math.PI / 180);
-			context.drawImage(tank1, -15, -15, 30, 30);
-			context.restore();
-			
-			context.save();
-			context.translate(currentX, currentY);
-			context.rotate(gunAngle * Math.PI / 180);
-			context.drawImage(tank1, 0, 0, 30, 5);
-			context.restore();
+	//	$.getJSON({
+	//		url : url,
+	//		data:  jobj,
+	//		type: 'POST',
+	//		dataType: 'json'
+	//	});	
+	//}	
 
-			// Tank 2
-			context.drawImage(tank2, currentX2 - 15, currentY2 - 15, 30, 30);
-			context.drawImage(tank2, currentX2, currentY2, 30, 5);
-		}
-	}
-
-	$(function(){
-		$('body').everyTime(2000,function(){
-					$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
-
-							
-					});
-		});
-	});
+	//$(function(){
+	//	$('body').everyTime(200,function(){
+	//				$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
+	//					if (data && data.status=='success') {
+	//						//$('#test').html(data.x1);
+	//						currentX2 = data.x1; 
+	//						currentY2 = data.y1;
+	//						currentAngle2 = data.x2;
+	//						gunAngle2 = data.angle;
+	//						updateTankState();
+	//					}	
+	//					});
+	//	});
+	//});
 	
 </script>
 
