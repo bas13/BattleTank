@@ -57,41 +57,47 @@
 
 </head>
 <body>
-	<!-- <h1>Battle Field</h1> -->
+	<h1>Battle Field</h1>
 
 	<div id="container">
-		<!--<div id="info">
-	<div>
-	Hello <?= $user->fullName() ?>  <?= anchor('account/logout','(Logout)') ?>  <?= anchor('account/updatePasswordForm','(Change Password)') ?>
-	</div>
-	
-	<div id='status'> 
-	<?php 
-		if ($status == "battling")
-			echo "Battling " . $otherUser->login;
-		else
-			echo "Wating on " . $otherUser->login;
-	?>
-	</div> -->
+		<div id="info">
+			<div>
+				Hello
+				<?= $user->fullName() ?>
+				<?= anchor('account/logout','(Logout)') ?>
+				<?= anchor('account/updatePasswordForm','(Change Password)') ?>
+			</div>
 
-		<?php 
+			<div id='status'>
+				<?php 
+				if ($status == "battling")
+					echo "Battling " . $otherUser->login;
+				else
+					echo "Wating on " . $otherUser->login;
+				?>
+			</div>
 
-		/*echo form_textarea('conversation');
+			<?php 
 
-		echo form_open();
-		echo form_input('msg');
-		echo form_submit('Send','Send');
-		echo form_close();*/
+			echo form_textarea('conversation');
 
-		?>
+			echo form_open();
+			echo form_input('msg');
+			echo form_submit('Send','Send');
+			echo form_close();
 
-
-
-		<canvas id="battleCanvas" width="700px" height="400px"></canvas>
-
-		<div style="border: solid 3 px;">
-			<p id='test'></p>
+			?>
 		</div>
+	</div>
+
+
+
+	<canvas id="battleCanvas" width="700px" height="400px"></canvas>
+
+	<div style="border: solid 3 px;">
+		<p id='test'></p>
+	</div>
+
 
 </body>
 
@@ -125,6 +131,50 @@
 	var gunAngle2 = 180;
 
 	$(function(){
+		
+		$(document).everyTime(200,function(){
+			$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
+				if (data && data.status=='success') {
+					$('#test').html(data.hit);
+					if (battleid == 1) {	
+						if (data.x1 != null) {
+							currentX2 = data.x1;
+						}
+
+						if (data.y1 != null) {
+							currentY2 = data.y1;
+						}
+
+					    if (data.x2 != null) {
+						    currentAngle2 = data.x2;
+					    }
+
+					    if (data.angle != null) {
+						    gunAngle2 = data.angle;
+					    }
+					}
+					else {
+						if (data.x1 != null) {
+							currentX = data.x1;
+						}
+
+						if (data.y1 != null) {
+							currentY = data.y1;
+						}
+
+						if (data.x2 != null) {
+							currentAngle = data.x2;
+						}
+
+						if (data.angle != null) {
+							gunAngle = data.angle;
+						}
+					}
+				}	
+				});
+			});
+
+		
 		initializeTanks();
 
 		$(document).keydown(function(e) {
@@ -160,10 +210,11 @@
 				}
 				
 			}
+			sendTankState();
 			animateTanks();
 		});
 	});
-
+	
 	function initializeTanks() {
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		
@@ -183,6 +234,7 @@
 		context.rotate(gunAngle2 * Math.PI / 180);
 		context.drawImage(tank2, 0, 0, 30, 5);
 		context.restore();
+		sendTankState();
 	}
 
 	function move(direction) {
@@ -206,6 +258,7 @@
 				currentY2 -= Math.sin(currentAngle2 * Math.PI / 180);
 			}
 		}
+		sendTankState();
 		animateTanks();
 	}
 
@@ -227,6 +280,7 @@
 				currentAngle2 += 1;
 			}
 		}
+		sendTankState();
 		animateTanks();
 	}
 
@@ -262,39 +316,36 @@
 		context.restore();
 	}
 
-	//function sendTankState() {
-	//	var url = '<?= base_url() ?>combat/updateBattleState';
-	//	var jobj = {};
-	//	jobj['x1'] = currentX;
-	//	jobj['y1'] = currentY;
-	//	jobj['x2'] = currentAngle;
-	//	jobj['y2'] = 0;
-	//	jobj['angle'] = gunAngle;
-	//	jobj['shot'] = 0;
-	//	jobj['hit'] = 0;
+	function sendTankState() {
+		var url = '<?= base_url() ?>combat/updateBattleState';
+		var jobj = {};
+		if (battleid == 1) {
+		    jobj['x1'] = currentX;
+		    jobj['y1'] = currentY;
+		    jobj['x2'] = currentAngle;
+		    jobj['y2'] = 0;
+		    jobj['angle'] = gunAngle;
+		    jobj['shot'] = 0;
+		    jobj['hit'] = 0;
+		}
+		else {
+		    jobj['x1'] = currentX2;
+		    jobj['y1'] = currentY2;
+		    jobj['x2'] = currentAngle2;
+		    jobj['y2'] = 0;
+		    jobj['angle'] = gunAngle2;
+		    jobj['shot'] = 0;
+		    jobj['hit'] = 0;
+		}
 
-	//	$.getJSON({
-	//		url : url,
-	//		data:  jobj,
-	//		type: 'POST',
-	//		dataType: 'json'
-	//	});	
-	//}	
+		var jtext = "json=" + JSON.stringify(jobj);
 
-	//$(function(){
-	//	$('body').everyTime(200,function(){
-	//				$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
-	//					if (data && data.status=='success') {
-	//						//$('#test').html(data.x1);
-	//						currentX2 = data.x1; 
-	//						currentY2 = data.y1;
-	//						currentAngle2 = data.x2;
-	//						gunAngle2 = data.angle;
-	//						updateTankState();
-	//					}	
-	//					});
-	//	});
-	//});
+		$.ajax({
+			url : url,
+			data:  jtext,
+			type: 'POST'
+		});	
+	}	
 	
 </script>
 
