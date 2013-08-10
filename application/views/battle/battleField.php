@@ -14,7 +14,7 @@
 		var status = "<?= $status ?>";
 		var battleid = "<?= $battleid ?>";
 		
-		$(function(){ /*
+		$(function(){ 
 			$('body').everyTime(2000,function(){
 					if (status == 'waiting') {
 						$.getJSON('<?= base_url() ?>arcade/checkInvitation',function(data, text, jqZHR){
@@ -49,7 +49,7 @@
 						$('[name=conversation]').val(conversation + "\n" + user + ": " + msg);
 						});
 				return false;
-				});	*/
+				});	
 		});
 	
 	</script>
@@ -97,6 +97,9 @@
 	<div style="border: solid 3 px;">
 		<p id='test'></p>
 	</div>
+	<div style="border: solid 3 px;">
+		<p id='test2'></p>
+	</div>
 
 
 </body>
@@ -143,11 +146,11 @@
 	var gunAngle2 = 180;
 
 	$(function(){
-		/*
-		$(document).everyTime(100,function(){
+/*
+		$(document).everyTime(200,function(){
 			$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
 				if (data && data.status=='success') {
-					$('#test').html(data.hit);
+					$('#test').html(data.shot);
 					if (battleid == 1) {	
 						if (data.x1 != null) {
 							currentX2 = data.x1;
@@ -163,6 +166,11 @@
 
 					    if (data.angle != null) {
 						    gunAngle2 = data.angle;
+					    }
+					    if (data.shot != null && data.shot == 1) {
+						    //clearEnemyShot();
+						    bulletFire(2);
+
 					    }
 					}
 					else {
@@ -181,25 +189,28 @@
 						if (data.angle != null) {
 							gunAngle = data.angle;
 						}
+					    if (data.shot != null && data.shot == 1) {
+					    	//clearEnemyShot();
+					    	bulletFire(1);
+					    }
 					}
 				}	
 				});
+			    animateTanks();
 			});
 
-		$(document).everyTime(100,function(){
-			sendTankState(); 
-			animateTanks();
-		});
 
-		*/
+		$(document).everyTime(200,function(){
+			sendTankState(); 
+		});
+*/
 		initializeTanks();
 
 		$(document).click(function(e) { 
 		    // Check for left button
 		    if (e.button == 0) {
 		    	//bulletFire();
-		    	bulletFire();
-	
+		    	bulletFire(battleid);
 		    }
 
 		});
@@ -260,6 +271,7 @@
 		context.rotate(gunAngle2 * Math.PI / 180);
 		context.drawImage(tank2, 0, 0, 30, 5);
 		context.restore();
+
 	}
 
 	function move(direction) {
@@ -304,6 +316,7 @@
 				currentAngle2 += 1;
 			}
 		}
+
 		animateTanks();
 	}
 
@@ -337,22 +350,25 @@
 		context.drawImage(tank2, 0, 0, 30, 5);
 		context.restore();
 
-		if (firing) {
+		if (firing == true) {
 		    // Bullet 1
 		    context.save();
 		    context.translate(bulletX, bulletY);
 		    context.rotate(bulletAngle * Math.PI / 180);
 		    context.drawImage(bullet, 0, 0, 10, 10);
 		    context.restore();
+		    $('#test2').html("bulletx: " + bulletX + " bullety: " + bulletY);
 		}
 
-		if (firing2) {
+		if (firing2 == true) {
 			// Bullet 2
 			context.save();
 			context.translate(bulletX2, bulletY2);
 			context.rotate(bulletAngle2 * Math.PI / 180);
 			context.drawImage(bullet, 0, 0, 10, 10);
 			context.restore();
+			$('#test2').html("bulletx2: " + bulletX2 + " bullety2: " + bulletY2);
+			//alert('bf2');
 		}
 		//alert("bulletx: " + bulletX + " bullety: " + bulletY );
 		
@@ -367,7 +383,12 @@
 		    jobj['x2'] = currentAngle;
 		    jobj['y2'] = 0;
 		    jobj['angle'] = gunAngle;
-		    jobj['shot'] = 0;
+		    if (firing == true) {
+		        jobj['shot'] = 1;
+		    }
+		    else {
+		    	jobj['shot'] = 0;
+		    }
 		    jobj['hit'] = 0;
 		}
 		else {
@@ -376,7 +397,12 @@
 		    jobj['x2'] = currentAngle2;
 		    jobj['y2'] = 0;
 		    jobj['angle'] = gunAngle2;
-		    jobj['shot'] = 0;
+		    if (firing2 == true) {
+		        jobj['shot'] = 1;
+		    }
+		    else {
+		    	jobj['shot'] = 0;
+		    }
 		    jobj['hit'] = 0;
 		}
 
@@ -389,46 +415,63 @@
 		});	
 	}
 
-	function bulletFireHelper() {
-		if (battleid == 1) {
+	function sendBulletState() {
+		
+	}
+	
+
+	function clearEnemyShot() {
+		var url = '<?= base_url() ?>combat/clearShots';
+		$.ajax({
+			url : url
+		});	
+	}
+	
+
+	function bulletFireHelper(tankid) {
+		if (tankid == 1) {
 		    if ((bulletX < - 10 ) || (bulletX > canvas.width + 10) || (bulletY < -10 ) || (bulletY > canvas.height + 10)) {
 			    firing = false;
-			    return null;
+			    bulletX = currentX;
+			    bulletY = currentY;
+			    bulletAngle = gunAngle;
 		    }
-		    else {
-
+		    else if (firing == true) {
 			    animateTanks();
-
 
 			    bulletX += 10 * Math.cos(bulletAngle * Math.PI / 180);
 			    bulletY += 10 * Math.sin(bulletAngle * Math.PI / 180);
 
+			    window.setTimeout(function(){
+					bulletFireHelper(tankid);
+					}, 100);
 		    }
-			window.setTimeout(function(){
-				bulletFireHelper();
-				}, 10);
+			
 		}
-		else {
+		else if (tankid == 2) {
 		    if ((bulletX2 < - 10 ) || (bulletX2 > canvas.width + 10) || (bulletY2 < -10 ) || (bulletY2 > canvas.height + 10)) {
-			    firing = false;
-			    return null;
+			    firing2 = false;
+			    bulletX2 = currentX2;
+			    bulletY2 = currentY2;
+			    bulletAngle2 = gunAngle2;
 		    }
 		    else {
-
 			    animateTanks();
 
 			    bulletX2 += 10 * Math.cos(bulletAngle2 * Math.PI / 180);
 			    bulletY2 += 10 * Math.sin(bulletAngle2 * Math.PI / 180);
+			    
 
 		    }
-			window.setTimeout(function(){
-				bulletFireHelper();
-				}, 10);
+		    window.setTimeout(function(){
+				bulletFireHelper(tankid);
+				}, 100);
+
 		}
 	}
 
-	function bulletFire() {
-		if (battleid == 1) {
+	function bulletFire(tankid) {
+		if (tankid == 1 && firing == false) {
 		    firing = true;
 		    bulletX = currentX;
 		    bulletY = currentY;
@@ -437,7 +480,7 @@
 		    bulletX += 20 * Math.cos(bulletAngle * Math.PI / 180);
 		    bulletY += 20 * Math.sin(bulletAngle * Math.PI / 180);
 		}
-		else {
+		else if (tankid == 2 && firing2 == false) {
 		    firing2 = true;
 		    bulletX2 = currentX2;
 		    bulletY2 = currentY2;
@@ -446,7 +489,7 @@
 		    bulletX2 += 20 * Math.cos(bulletAngle2 * Math.PI / 180);
 		    bulletY2 += 20 * Math.sin(bulletAngle2 * Math.PI / 180);
 		}
-		bulletFireHelper();
+		bulletFireHelper(tankid);
 	}	
 
 	function testbullet() {
