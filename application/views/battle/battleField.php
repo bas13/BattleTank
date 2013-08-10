@@ -513,6 +513,8 @@
 
 		    bulletX += 20 * Math.cos(bulletAngle * Math.PI / 180);
 		    bulletY += 20 * Math.sin(bulletAngle * Math.PI / 180);
+
+		    bulletFireHelper(tankid);
 		}
 		else if (tankid == 2 && firing2 == false) {
 		    firing2 = true;
@@ -522,8 +524,9 @@
 
 		    bulletX2 += 20 * Math.cos(bulletAngle2 * Math.PI / 180);
 		    bulletY2 += 20 * Math.sin(bulletAngle2 * Math.PI / 180);
+
+		    bulletFireHelper(tankid);
 		}
-		bulletFireHelper(tankid);
 	}
 </script>
 

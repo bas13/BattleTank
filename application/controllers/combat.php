@@ -40,17 +40,8 @@ class Combat extends CI_Controller {
 	    		}
 	    		else {
 	    			$otherUser = $this->user_model->getFromId($battle->user1_id);
-	    		}
-	    		
+	    		}	
 	    	}
-	    	$battle = $this->battle_model->get($user->battle_id);
-	    	if ($battle->user1_id == $user->id) {
-	    		$data['battleid']=1;
-	    	}
-	    	else {
-	    		$data['battleid']=2;
-	    	}
-	    	
 	    	
 	    	$data['user']=$user;
 	    	$data['otherUser']=$otherUser;
@@ -62,6 +53,14 @@ class Combat extends CI_Controller {
 	    		case User::WAITING:
 	    			$data['status'] = 'waiting';
 	    			break;
+	    	}
+	    	
+	    	$battle = $this->battle_model->get($user->battle_id);
+	    	if ($battle->user1_id == $user->id) {
+	    		$data['battleid']=1;
+	    	}
+	    	else {
+	    		$data['battleid']=2;
 	    	}
 	    	
 		$this->load->view('battle/battleField',$data);
