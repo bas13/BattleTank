@@ -50,13 +50,11 @@ class Account extends CI_Controller {
     			} else if(isset($_SESSION['delay']) && isset($_SESSION['fail_count']) && $_SESSION['fail_count'] > 0) {
 					$_SESSION['fail_count'] += 1;
 					$_SESSION['delay'] = pow(2,$_SESSION['fail_count'] - 1);
-					$data['errorMsg'] = 'Incorrect username or password! If incorrect again after pressing Login, wait ' . $_SESSION['delay']*2 .
-					' seconds and then try again!';
 				} else {
 					$_SESSION['fail_count'] = 1;
 					$_SESSION['delay'] = 0;
-					$data['errorMsg']='Incorrect username or password!';
 				}
+				$data['errorMsg']='Incorrect username or password!';
 				$data['user'] = $user;
 				$this->load->view('account/loginForm',$data);
 				//redirect('account/loginForm', 'refresh');
