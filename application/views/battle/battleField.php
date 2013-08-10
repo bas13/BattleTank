@@ -132,7 +132,7 @@
 
 	$(function(){
 		
-		$(document).everyTime(200,function(){
+		$(document).everyTime(100,function(){
 			$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
 				if (data && data.status=='success') {
 					$('#test').html(data.hit);
@@ -174,6 +174,10 @@
 				});
 			});
 
+		$(document).everyTime(1000,function(){
+			sendTankState();
+			animateTanks();
+		});
 		
 		initializeTanks();
 
@@ -210,7 +214,7 @@
 				}
 				
 			}
-			sendTankState();
+			//sendTankState();
 			animateTanks();
 		});
 	});
@@ -234,7 +238,7 @@
 		context.rotate(gunAngle2 * Math.PI / 180);
 		context.drawImage(tank2, 0, 0, 30, 5);
 		context.restore();
-		sendTankState();
+		//sendTankState();
 	}
 
 	function move(direction) {
@@ -258,7 +262,7 @@
 				currentY2 -= Math.sin(currentAngle2 * Math.PI / 180);
 			}
 		}
-		sendTankState();
+		//sendTankState();
 		animateTanks();
 	}
 
@@ -280,7 +284,7 @@
 				currentAngle2 += 1;
 			}
 		}
-		sendTankState();
+		//sendTankState();
 		animateTanks();
 	}
 

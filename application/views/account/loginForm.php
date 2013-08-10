@@ -34,9 +34,7 @@
 	
 	echo form_close();
 	
-	echo "OUTSIDE";
 	if (isset($_SESSION['delay']) && isset($_SESSION['fail_count']) && $_SESSION['fail_count'] > 1) {
-		echo "INSIDE";
 		sleep($_SESSION['delay']);
 	}
 	
