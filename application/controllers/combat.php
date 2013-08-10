@@ -37,14 +37,20 @@ class Combat extends CI_Controller {
 	    		$battle = $this->battle_model->get($user->battle_id);
 	    		if ($battle->user1_id == $user->id) {
 	    			$otherUser = $this->user_model->getFromId($battle->user2_id);
-	    		    $data['battleid']=1;
 	    		}
 	    		else {
 	    			$otherUser = $this->user_model->getFromId($battle->user1_id);
-	    			$data['battleid']=2;
 	    		}
 	    		
 	    	}
+	    	$battle = $this->battle_model->get($user->battle_id);
+	    	if ($battle->user1_id == $user->id) {
+	    		$data['battleid']=1;
+	    	}
+	    	else {
+	    		$data['battleid']=2;
+	    	}
+	    	
 	    	
 	    	$data['user']=$user;
 	    	$data['otherUser']=$otherUser;
@@ -244,6 +250,47 @@ class Combat extends CI_Controller {
  		error:
  		echo json_encode(array('status'=>'failure','message'=>$errormsg));
 
+ 	}
+ 	
+ 	function clearShots() {
+ 		$this->load->model('user_model');
+ 		$this->load->model('battle_model');
+ 		
+ 		$user = $_SESSION['user'];
+ 		
+ 		$user = $this->user_model->get($user->login);
+ 		if ($user->user_status_id != User::BATTLING) {
+ 			$errormsg="Not in BATTLING state";
+ 			goto error;
+ 		}
+ 		// start transactional mode
+ 		$this->db->trans_begin();
+ 			
+ 		$battle = $this->battle_model->get($user->battle_id);
+ 			
+ 		if ($battle->user2_id === $user->id) {
+ 			$this->battle_model->clearShotU1($user->battle_id);
+ 		}
+ 		else if ($battle->user1_id === $user->id) {
+ 			$this->battle_model->clearShotU2($user->battle_id);
+ 		}
+ 		
+ 		if ($this->db->trans_status() === FALSE) {
+ 			$errormsg = "Transaction error";
+ 			goto transactionerror;
+ 		}
+ 		
+ 		// if all went well commit changes
+ 		$this->db->trans_commit();
+ 			
+ 		echo json_encode(array('status'=>'success'));
+ 		return;
+ 			
+ 		transactionerror:
+ 		$this->db->trans_rollback();
+ 			
+ 		error:
+ 		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}
  	
  }

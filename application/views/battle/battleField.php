@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 
 <html>
@@ -51,7 +52,10 @@
 				return false;
 				});	
 		});
-	
+
+
+
+		
 	</script>
 
 
@@ -93,18 +97,44 @@
 
 
 	<canvas id="battleCanvas" width="700px" height="400px"></canvas>
+	
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
 
-	<div style="border: solid 3 px;">
+	<div id="out">
+	<div style="border-style: solid;">
 		<p id='test'></p>
 	</div>
-	<div style="border: solid 3 px;">
+	<div style="border-style: solid;">
 		<p id='test2'></p>
 	</div>
+	<div style="border-style: solid;">
+		<p id='test3'></p>
+	</div>
+	</div>
 
-
-</body>
-
-<script>
+	
+	<script>
 	var tank1 = new Image();
 	var tank2 = new Image();
 	var bullet = new Image();
@@ -146,26 +176,26 @@
 	var gunAngle2 = 180;
 
 	$(function(){
-/*
+
 		$(document).everyTime(200,function(){
 			$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
 				if (data && data.status=='success') {
 					$('#test').html(data.shot);
 					if (battleid == 1) {	
 						if (data.x1 != null) {
-							currentX2 = data.x1;
+							currentX2 = parseInt(data.x1);
 						}
 
 						if (data.y1 != null) {
-							currentY2 = data.y1;
+							currentY2 = parseInt(data.y1);
 						}
 
 					    if (data.x2 != null) {
-						    currentAngle2 = data.x2;
+						    currentAngle2 = parseInt(data.x2);
 					    }
 
 					    if (data.angle != null) {
-						    gunAngle2 = data.angle;
+						    gunAngle2 = parseInt(data.angle);
 					    }
 					    if (data.shot != null && data.shot == 1) {
 						    //clearEnemyShot();
@@ -175,19 +205,19 @@
 					}
 					else {
 						if (data.x1 != null) {
-							currentX = data.x1;
+							currentX = parseInt(data.x1);
 						}
 
 						if (data.y1 != null) {
-							currentY = data.y1;
+							currentY = parseInt(data.y1);
 						}
 
 						if (data.x2 != null) {
-							currentAngle = data.x2;
+							currentAngle = parseInt(data.x2);
 						}
 
 						if (data.angle != null) {
-							gunAngle = data.angle;
+							gunAngle = parseInt(data.angle);
 						}
 					    if (data.shot != null && data.shot == 1) {
 					    	//clearEnemyShot();
@@ -203,7 +233,8 @@
 		$(document).everyTime(200,function(){
 			sendTankState(); 
 		});
-*/
+
+
 		initializeTanks();
 
 		$(document).click(function(e) { 
@@ -253,6 +284,9 @@
 	});
 	
 	function initializeTanks() {
+		firing2 = false;
+
+		
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		
 		// Tank 1
@@ -367,7 +401,7 @@
 			context.rotate(bulletAngle2 * Math.PI / 180);
 			context.drawImage(bullet, 0, 0, 10, 10);
 			context.restore();
-			$('#test2').html("bulletx2: " + bulletX2 + " bullety2: " + bulletY2);
+			$('#test3').html("bulletx2: " + bulletX2 + " bullety2: " + bulletY2);
 			//alert('bf2');
 		}
 		//alert("bulletx: " + bulletX + " bullety: " + bulletY );
@@ -455,17 +489,17 @@
 			    bulletY2 = currentY2;
 			    bulletAngle2 = gunAngle2;
 		    }
-		    else {
+		    else if (firing2 == true){
 			    animateTanks();
 
 			    bulletX2 += 10 * Math.cos(bulletAngle2 * Math.PI / 180);
 			    bulletY2 += 10 * Math.sin(bulletAngle2 * Math.PI / 180);
-			    
 
+			    window.setTimeout(function(){
+					bulletFireHelper(tankid);
+					}, 100);
 		    }
-		    window.setTimeout(function(){
-				bulletFireHelper(tankid);
-				}, 100);
+		    
 
 		}
 	}
@@ -490,18 +524,10 @@
 		    bulletY2 += 20 * Math.sin(bulletAngle2 * Math.PI / 180);
 		}
 		bulletFireHelper(tankid);
-	}	
-
-	function testbullet() {
-		alert('click');
-		bulletX = 100;
-		bulletY = 100;
-		animateTanks();
 	}
-
-	
-	
 </script>
+
+</body>
 
 </html>
 
