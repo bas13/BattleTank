@@ -46,24 +46,35 @@ class Combat extends CI_Controller {
 	    	$data['user']=$user;
 	    	$data['otherUser']=$otherUser;
 	    	
+	    	
 	    	switch($user->user_status_id) {
 	    		case User::BATTLING:	
 	    			$data['status'] = 'battling';
+	    			
+	    			$battle = $this->battle_model->get($user->battle_id);
+	    			
+	    			if ($battle->user1_id == $user->id || $battle->user2_id == $otherUser->id) {
+	    				$data['battleid']= 1;
+	    			}
+	    			else if ($battle->user2_id == $user->id || $battle->user1_id == $otheruser->id) {
+	    				$data['battleid']= 2;
+	    			}
+	    			
+	    			$this->load->view('battle/battleField',$data);
 	    			break;
 	    		case User::WAITING:
 	    			$data['status'] = 'waiting';
+	    			
+	    			$this->load->view('battle/waiting', $data);
 	    			break;
 	    	}
 	    	
-	    	$battle = $this->battle_model->get($user->battle_id);
-	    	if ($battle->user1_id == $user->id) {
-	    		$data['battleid']=1;
-	    	}
-	    	else {
-	    		$data['battleid']=2;
-	    	}
 	    	
-		$this->load->view('battle/battleField',$data);
+
+	    	
+	    
+	    	//$this->load->view('battle/waiting', $data);
+		//$this->load->view('battle/battleField',$data);
     }
 
  	function postMsg() {
@@ -258,12 +269,12 @@ class Combat extends CI_Controller {
 
  	}
  	
- 	function clearShots() {
+ 	function clearBattle() {
  		$this->load->model('user_model');
  		$this->load->model('battle_model');
- 		
+ 			
  		$user = $_SESSION['user'];
- 		
+ 			
  		$user = $this->user_model->get($user->login);
  		if ($user->user_status_id != User::BATTLING) {
  			$errormsg="Not in BATTLING state";
@@ -272,29 +283,30 @@ class Combat extends CI_Controller {
  		// start transactional mode
  		$this->db->trans_begin();
  			
+ 		// Set both users to active
  		$battle = $this->battle_model->get($user->battle_id);
- 			
- 		if ($battle->user2_id === $user->id) {
- 			$this->battle_model->clearShotU1($user->battle_id);
- 		}
- 		else if ($battle->user1_id === $user->id) {
- 			$this->battle_model->clearShotU2($user->battle_id);
- 		}
+ 		$this->user_model->updateStatus($battle->user1_id, User::AVAILABLE);
+ 		$this->user_model->updateStatus($battle->user2_id, User::AVAILABLE);
+ 		
+ 		
+ 		$battle = $this->battle_model->deleteBattle($user->battle_id);
+ 		
  		
  		if ($this->db->trans_status() === FALSE) {
  			$errormsg = "Transaction error";
  			goto transactionerror;
  		}
- 		
+ 			
  		// if all went well commit changes
  		$this->db->trans_commit();
- 			
+ 		
  		echo json_encode(array('status'=>'success'));
  		return;
- 			
+ 		
  		transactionerror:
  		$this->db->trans_rollback();
- 			
+ 		
+ 		
  		error:
  		echo json_encode(array('status'=>'failure','message'=>$errormsg));
  	}

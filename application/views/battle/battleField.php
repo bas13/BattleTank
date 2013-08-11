@@ -96,8 +96,9 @@
 
 
 
-	<canvas id="battleCanvas" width="700px" height="400px"></canvas>
-	
+	<canvas
+		id="battleCanvas" width="700px" height="400px"></canvas>
+
 	<br />
 	<br />
 	<br />
@@ -122,18 +123,18 @@
 	<br />
 
 	<div id="out">
-	<div style="border-style: solid;">
-		<p id='test'></p>
-	</div>
-	<div style="border-style: solid;">
-		<p id='test2'></p>
-	</div>
-	<div style="border-style: solid;">
-		<p id='test3'></p>
-	</div>
+		<div style="border-style: solid;">
+			<p id='test'></p>
+		</div>
+		<div style="border-style: solid;">
+			<p id='test2'></p>
+		</div>
+		<div style="border-style: solid;">
+			<p id='test3'></p>
+		</div>
 	</div>
 
-	
+
 	<script>
 	var tank1 = new Image();
 	var tank2 = new Image();
@@ -150,8 +151,8 @@
 	var mouseY = 0;
 
 	// Tank 1 info
-	var bulletX = 15;
-	var bulletY = 15;
+	var bulletX = -100;
+	var bulletY = -100;
 	var bulletAngle = 0;
 	var firing = false;
 	
@@ -163,8 +164,8 @@
 	var gunAngle = 0;
 
 	// Tank 2 info
-	var bulletX2 = 15;
-	var bulletY2 = 15;
+	var bulletX2 = -200;
+	var bulletY2 = -200;
 	var bulletAngle2 = 0;
 	var firing2 = false;
 	
@@ -183,7 +184,7 @@
 		$(document).everyTime(200,function(){
 			$.getJSON('<?= base_url() ?>combat/getBattleState',function(data, text, jqZHR){
 				if (data && data.status=='success') {
-					$('#test').html(data.shot);
+					$('#test').html(data.hit);
 					if (battleid == 1) {	
 						if (data.x1 != null) {
 							currentX2 = parseInt(data.x1);
@@ -205,8 +206,9 @@
 						    bulletFire(2);
 					    }
 					    if (data.hit != null && parseInt(data.hit) == 1) {
+					    	endBattle();
 					    	alert("You win...");
-					    	hit2 = true;
+					    	window.location.href = '<?= base_url() ?>arcade/index';
 					    }
 					}
 					else {
@@ -226,12 +228,12 @@
 							gunAngle = parseInt(data.angle);
 						}
 					    if (data.shot != null && parseInt(data.shot) == 1) {
-					    	//clearEnemyShot();
 					    	bulletFire(1);
 					    }
 					    if (data.hit != null && parseInt(data.hit) == 1) {
+					    	endBattle();
 					    	alert("You win...");
-					    	hit = true;
+					    	window.location.href = '<?= base_url() ?>arcade/index';
 					    }
 					}
 				}	
@@ -247,10 +249,9 @@
 
 		initializeTanks();
 
-		$(document).click(function(e) { 
+		$('#battleCanvas').click(function(e) { 
 		    // Check for left button
 		    if (e.button == 0) {
-		    	//bulletFire();
 		    	bulletFire(battleid);
 		    }
 
@@ -294,9 +295,7 @@
 	});
 	
 	function initializeTanks() {
-		//firing2 = false;
-
-		
+	
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		
 		// Tank 1
@@ -471,19 +470,6 @@
 		});	
 	}
 
-	function sendBulletState() {
-		
-	}
-	
-
-	function clearEnemyShot() {
-		var url = '<?= base_url() ?>combat/clearShots';
-		$.ajax({
-			url : url
-		});	
-	}
-	
-
 	function bulletFireHelper(tankid) {
 		if (tankid == 1) {
 		    if ((bulletX < - 10 ) || (bulletX > canvas.width + 10) || (bulletY < -10 ) || (bulletY > canvas.height + 10)) {
@@ -554,18 +540,32 @@
 	}
 
 	function hitRad() {
-		var distance1 = Math.sqrt(Math.pow((bulletX - currentX),2) - Math.pow((bulletY - currentY),2));
-		var distance2 = Math.sqrt(Math.pow((bulletX2 - currentX2),2) - Math.pow((bulletY2 - currentY2),2));
+		var distance1 = Math.sqrt(Math.pow((bulletX2 - currentX),2) + Math.pow((bulletY2 - currentY),2));
+		var distance2 = Math.sqrt(Math.pow((bulletX - currentX2),2) + Math.pow((bulletY - currentY2),2));
 		if (battleid == 1 && distance1 <= 15) {
-			alert("You lose...");
 			hit = true;
+			sendTankState();
+			$.ajax({success:function(result){
+				alert("You lose...");
+				window.location.href = '<?= base_url() ?>arcade/index';
+			  }});
 		} else if (battleid == 2 && distance2 <= 15) {
-			alert("You lose...");
 			hit2 = true;
+			sendTankState();
+			$.ajax({success:function(result){
+				alert("You lose...");
+				window.location.href = '<?= base_url() ?>arcade/index';
+			  }});
 		}
 	}
-</script>
 
+	function endBattle() {
+		var url = '<?= base_url() ?>combat/clearBattle';
+		$.ajax({
+			url : url
+		});	
+	}
+</script>
 </body>
 
 </html>
