@@ -269,7 +269,7 @@
 			}
 		});
 
-		$(document).mousemove(function(e) {
+		$('#battleCanvas').mousemove(function(e) {
 			mouseX = e.pageX - canvas.offsetLeft;
 			mouseY = e.pageY - canvas.offsetTop;
 
@@ -542,14 +542,14 @@
 	function hitRad() {
 		var distance1 = Math.sqrt(Math.pow((bulletX2 - currentX),2) + Math.pow((bulletY2 - currentY),2));
 		var distance2 = Math.sqrt(Math.pow((bulletX - currentX2),2) + Math.pow((bulletY - currentY2),2));
-		if (battleid == 1 && distance1 <= 15) {
+		if (battleid == 1 && distance1 <= 16) {
 			hit = true;
 			sendTankState();
 			$.ajax({success:function(result){
 				alert("You lose...");
 				window.location.href = '<?= base_url() ?>arcade/index';
 			  }});
-		} else if (battleid == 2 && distance2 <= 15) {
+		} else if (battleid == 2 && distance2 <= 16) {
 			hit2 = true;
 			sendTankState();
 			$.ajax({success:function(result){
