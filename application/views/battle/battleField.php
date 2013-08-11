@@ -175,6 +175,9 @@
 	
 	var gunAngle2 = 180;
 
+	var hit = false;
+	var hit2 = false;
+
 	$(function(){
 
 		$(document).everyTime(200,function(){
@@ -197,10 +200,13 @@
 					    if (data.angle != null) {
 						    gunAngle2 = parseInt(data.angle);
 					    }
-					    if (data.shot != null && data.shot == 1) {
+					    if (data.shot != null && parseInt(data.shot) == 1) {
 						    //clearEnemyShot();
 						    bulletFire(2);
-
+					    }
+					    if (data.hit != null && parseInt(data.hit) == 1) {
+					    	alert("You win...");
+					    	hit2 = true;
 					    }
 					}
 					else {
@@ -219,9 +225,13 @@
 						if (data.angle != null) {
 							gunAngle = parseInt(data.angle);
 						}
-					    if (data.shot != null && data.shot == 1) {
+					    if (data.shot != null && parseInt(data.shot) == 1) {
 					    	//clearEnemyShot();
 					    	bulletFire(1);
+					    }
+					    if (data.hit != null && parseInt(data.hit) == 1) {
+					    	alert("You win...");
+					    	hit = true;
 					    }
 					}
 				}	
@@ -284,7 +294,7 @@
 	});
 	
 	function initializeTanks() {
-		firing2 = false;
+		//firing2 = false;
 
 		
 		context.clearRect(0, 0, canvas.width, canvas.height);
@@ -423,7 +433,13 @@
 		    else {
 		    	jobj['shot'] = 0;
 		    }
-		    jobj['hit'] = 0;
+
+		    if(hit == true) {
+		    	jobj['hit'] = 1;
+		    } else {
+		    	jobj['hit'] = 0;
+		    }
+		    
 		}
 		else {
 		    jobj['x1'] = currentX2;
@@ -437,7 +453,13 @@
 		    else {
 		    	jobj['shot'] = 0;
 		    }
-		    jobj['hit'] = 0;
+
+		    if (hit2 == true) {
+		    	jobj['hit'] = 1;
+		    } else {
+		    	jobj['hit'] = 0;
+		    }
+		    
 		}
 
 		var jtext = "json=" + JSON.stringify(jobj);
@@ -475,7 +497,8 @@
 
 			    bulletX += 10 * Math.cos(bulletAngle * Math.PI / 180);
 			    bulletY += 10 * Math.sin(bulletAngle * Math.PI / 180);
-
+				hitRad();
+			    
 			    window.setTimeout(function(){
 					bulletFireHelper(tankid);
 					}, 100);
@@ -494,7 +517,8 @@
 
 			    bulletX2 += 10 * Math.cos(bulletAngle2 * Math.PI / 180);
 			    bulletY2 += 10 * Math.sin(bulletAngle2 * Math.PI / 180);
-
+				hitRad();
+				
 			    window.setTimeout(function(){
 					bulletFireHelper(tankid);
 					}, 100);
@@ -526,6 +550,18 @@
 		    bulletY2 += 20 * Math.sin(bulletAngle2 * Math.PI / 180);
 
 		    bulletFireHelper(tankid);
+		}
+	}
+
+	function hitRad() {
+		var distance1 = Math.sqrt(Math.pow((bulletX - currentX),2) - Math.pow((bulletY - currentY),2));
+		var distance2 = Math.sqrt(Math.pow((bulletX2 - currentX2),2) - Math.pow((bulletY2 - currentY2),2));
+		if (battleid == 1 && distance1 <= 15) {
+			alert("You lose...");
+			hit = true;
+		} else if (battleid == 2 && distance2 <= 15) {
+			alert("You lose...");
+			hit2 = true;
 		}
 	}
 </script>

@@ -221,14 +221,21 @@ class Combat extends CI_Controller {
  		$this->db->trans_begin();
  		
  		$battle = $this->battle_model->getExclusive($user->battle_id);
+ 		$this->battle_model->updateStatus($user->battle_id,1);
  		
  		if ($battle->user1_id === $user->id) {
  			$this->battle_model->updateU1($user->battle_id, $battleData->x1, $battleData->y1, $battleData->x2, 
  					$battleData->y2, $battleData->angle, $battleData->shot, $battleData->hit);
+ 			if ($battleData->shot == 1) {
+ 				$this->battle_model->updateStatus($user->battle_id,2);
+ 			} 
  		}
  		else if ($battle->user2_id === $user->id) {
  			$this->battle_model->updateU2($user->battle_id, $battleData->x1, $battleData->y1, $battleData->x2, 
  					$battleData->y2, $battleData->angle, $battleData->shot, $battleData->hit);
+ 			if ($battleData->shot == 1) {
+ 				$this->battle_model->updateStatus($user->battle_id,3);
+ 			}
  		}
  		
  		if ($this->db->trans_status() === FALSE) {
