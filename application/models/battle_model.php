@@ -78,5 +78,10 @@ class Battle_model extends CI_Model {
 		return $this->db->update('battle',array('battle_status_id'=>$status));
 	}
 	
+	function deleteBattle($id) {
+		$this->db->where('id', $id);
+		return $this->db->delete('battle');
+	}
+	
 }
 ?>
