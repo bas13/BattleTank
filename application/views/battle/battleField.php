@@ -122,7 +122,7 @@
 	<br />
 	<br />
 
-	<div id="out">
+	<!--  <div id="out">
 		<div style="border-style: solid;">
 			<p id='test'></p>
 		</div>
@@ -132,7 +132,7 @@
 		<div style="border-style: solid;">
 			<p id='test3'></p>
 		</div>
-	</div>
+	</div> -->
 
 
 	<script>
@@ -300,7 +300,7 @@
 		
 		// Tank 1
 		context.drawImage(tank1, currentX - 15, currentY - 15, 30, 30);
-		context.drawImage(tank1, currentX, currentY, 30, 5);
+		context.drawImage(tank1, currentX, currentY, 30, 10);
 
 		// Tank 2
 		context.save();
@@ -312,7 +312,7 @@
 		context.save();
 		context.translate(currentX2, currentY2);
 		context.rotate(gunAngle2 * Math.PI / 180);
-		context.drawImage(tank2, 0, 0, 30, 5);
+		context.drawImage(tank2, 0, 0, 30, 10);
 		context.restore();
 
 	}
@@ -377,7 +377,7 @@
 		context.save();
 		context.translate(currentX, currentY);
 		context.rotate(gunAngle * Math.PI / 180);
-		context.drawImage(tank1, 0, 0, 30, 5);
+		context.drawImage(tank1, 0, 0, 30, 10);
 		context.restore();
 		
 		// Tank 2
@@ -390,7 +390,7 @@
 		context.save();
 		context.translate(currentX2, currentY2);
 		context.rotate(gunAngle2 * Math.PI / 180);
-		context.drawImage(tank2, 0, 0, 30, 5);
+		context.drawImage(tank2, 0, 0, 30, 10);
 		context.restore();
 
 		if (firing == true) {
@@ -400,7 +400,7 @@
 		    context.rotate(bulletAngle * Math.PI / 180);
 		    context.drawImage(bullet, 0, 0, 10, 10);
 		    context.restore();
-		    $('#test2').html("bulletx: " + bulletX + " bullety: " + bulletY);
+		    //$('#test2').html("bulletx: " + bulletX + " bullety: " + bulletY);
 		}
 
 		if (firing2 == true) {
@@ -410,7 +410,7 @@
 			context.rotate(bulletAngle2 * Math.PI / 180);
 			context.drawImage(bullet, 0, 0, 10, 10);
 			context.restore();
-			$('#test3').html("bulletx2: " + bulletX2 + " bullety2: " + bulletY2);
+			//$('#test3').html("bulletx2: " + bulletX2 + " bullety2: " + bulletY2);
 			//alert('bf2');
 		}
 		//alert("bulletx: " + bulletX + " bullety: " + bulletY );
